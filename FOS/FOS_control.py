@@ -12,11 +12,12 @@ window_length = 3
 
 for patient in patients:
     for seizure in range(1, 9):  
-        if os.path.exists(f"{main_pathname}data/{patient}/{patient}-ictal-block-{seizure}.mat"):
+        filepath = os.path.join(main_pathname, 'data', patient, f"{patient}-ictal-block-{seizure}.mat")
+        if os.path.exists(filepath):
             print(f"{patient}_{seizure}")
-            results = f"{main_pathname}Results/{patient}/ictal-block-{seizure}"
-            FOS_params = scipy.io.loadmat(f"{main_pathname}data/{patient}/ictal-block-{seizure}_ictal_parameters_3sec_1iter.mat")
-            raw_data = scipy.io.loadmat(f"{main_pathname}data/{patient}/{patient}-ictal-block-{seizure}.mat")
+            results = os.path.join(main_pathname, 'Results', patient, f"ictal-block-{seizure}")
+            FOS_params = scipy.io.loadmat(os.path.join(main_pathname, 'data', patient, f"ictal-block-{seizure}_ictal_parameters_3sec_1iter.mat"))
+            raw_data = scipy.io.loadmat(os.path.join(main_pathname, 'data', patient, f"ictal-block-{seizure}_ictal_parameters_3sec_1iter.mat"))
             sampling_rate = int(np.ceil(raw_data['Fs'][0][0]))
             A_0 = FOS_params["A_0"]
             A = FOS_params["A"]
@@ -24,7 +25,7 @@ for patient in patients:
             num_chns = FOS_params["A"].shape[0]
             evData = raw_data["evData"]
             
-            ictal_start = 18
+            ictal_start = 20
             # Changing A Problem 1
             A_0_inst = A_0[:,:,ictal_start]
             A_0_inst = np.array(A_0_inst)
@@ -94,5 +95,6 @@ for patient in patients:
                     contrib   = (A_current @ XUse).sum(axis=1)     
                     XTemp[:, t] += contrib
                 xPred[:, i * numStep : (i + 1) * numStep] = XTemp[:, i * numStep : (i + 1) * numStep]
-            scipy.io.savemat(f"{main_pathname}data/{patient}/controlled_data_block_{seizure}.mat", {"evData": xPred, "Fs": sampling_rate})
+            savepath = os.path.join(main_pathname, 'data', patient, f"controlled_data_block_{seizure}.mat")
+            scipy.io.savemat(savepath, {"evData": xPred, "Fs": sampling_rate})
 

@@ -15,7 +15,8 @@ def load_fos_params(patient, seizure, condition, window_size):
 
 for patient in patients: 
     for seizure in range (1, 9):
-        if os.path.exists(f'{main_pathname}/{patient}/ictal-block-{seizure}_parameters_{window_size}sec_1iter.mat'):
+        file_path = os.path.join(main_pathname, patient, f"ictal-block-{seizure}_parameters_{window_size}sec_1iter.mat")
+        if os.path.exists(file_path):
             ictal_data = load_fos_params(patient, seizure, 'ictal', window_size)
             interictal_data = load_fos_params(patient, seizure, 'interictal', window_size)
             num_windows = ictal_data['alpha'].shape[1]
@@ -35,7 +36,8 @@ for patient in patients:
             ictal_eigen = ictal_eigen_all[:, ictal_start:ictal_end]
             postictal_eigen = ictal_eigen_all[:, num_windows-20:num_windows]
 
-            np.savez(f'{main_pathname}/{patient}/fos_features_block_{seizure}.npz',
+            save_path = os.path.join(main_pathname, patient, f"fos_features_block_{seizure}.npz")
+            np.savez(save_path,
                 preictal_alpha = preictal_alpha,
                 ictal_alpha = ictal_alpha,
                 postictal_alpha = postictal_alpha,
