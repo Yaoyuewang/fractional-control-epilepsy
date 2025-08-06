@@ -35,23 +35,26 @@ def process_block(sampling_rate, evData, num_chns, window_length):
     all_mse = []
 
     # print(f"Running block in PID {os.getpid()}")
-    for w, start_idx in tqdm(enumerate(range(0, evData.shape[1] - window_samples + 1, stride_samples))):
+    for window, start_idx in enumerate(range(0, evData.shape[1] - window_samples + 1, stride_samples)):
         X = evData[:, start_idx:start_idx + window_samples]
-
+        X = X.T - np.mean(X, axis = 1)
+        X = X.T
         fModel = fracOrdUU(verbose=-1)
         mseIter = fModel.fit(X)
         all_mse.append(mseIter)
         fModel._order[np.abs(fModel._order) < 0.01] = 0
-        alpha[:, w] = fModel._order
-        A[:, :, w] = fModel._AMat[-1]
+        alpha[:, window] = fModel._order
+        # A[:, :, w] = fModel._AMat[-1]
+        A[:, :, window] = np.squeeze(fModel._AMat[-1])
+
         xPred[:, start_idx:start_idx + sampling_rate * window_length] = reconstruct_FOS(
-            alpha[:, w], A[:, :, w], X, num_chns, sampling_rate, window_length
+            alpha[:, window], A[:, :, window], X, num_chns, sampling_rate, window_length
         )
 
         v = np.where(fModel._order == 0, 1, gamma(1 - fModel._order) / gamma(-fModel._order))
         D = np.diag(v)
-        A_0[:, :, w] = A[:, :, w] - D
-        eigenvalues[:, w], eigenvectors[:, :, w] = np.linalg.eig(A_0[:, :, w])
+        A_0[:, :, window] = A[:, :, window] - D
+        eigenvalues[:, window], eigenvectors[:, :, window] = np.linalg.eig(A_0[:, :, window])
     return alpha, A, A_0, eigenvalues, eigenvectors, xPred, all_mse
 
 def process_data(seizure, patient, path, window_length, main_pathname, condition):
