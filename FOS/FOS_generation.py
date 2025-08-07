@@ -11,7 +11,9 @@ from tqdm import tqdm
 from functions import fracOrdUU, reconstruct_FOS
 from multiprocessing import Pool
 
-patients = ['HUP64', 'HUP68','HUP70','HUP72','HUP78','HUP86','MAYO010','MAYO011','MAYO016','MAYO020']
+# patients = ['HUP64', 'HUP68','HUP70','HUP72','HUP78','HUP86','MAYO010','MAYO011','MAYO016','MAYO020']
+patients = ['MAYO010','MAYO011','MAYO016','MAYO020']
+
 # patients = ['HUP70']
 num_seizures = 35 
 window_length = 3
@@ -44,7 +46,6 @@ def process_block(sampling_rate, evData, num_chns, window_length):
         all_mse.append(mseIter)
         fModel._order[np.abs(fModel._order) < 0.01] = 0
         alpha[:, window] = fModel._order
-        # A[:, :, w] = fModel._AMat[-1]
         A[:, :, window] = np.squeeze(fModel._AMat[-1])
 
         xPred[:, start_idx:start_idx + sampling_rate * window_length] = reconstruct_FOS(
@@ -78,8 +79,10 @@ def process_data(seizure, patient, path, window_length, main_pathname, condition
         "eigenvalues": eigenvalues, "eigenvectors": eigenvectors, 
         "xPred": xPred
     }
-    scipy.io.savemat(os.path.join(main_pathname, 'data_v2', patient,
-        f'{condition}-block-{seizure}_parameters_{window_length}sec_1iter.mat'), fos_data, do_compression=True)
+    save_path = os.path.join(main_pathname, 'data_v2', patient, f'{condition}-block-{seizure}_parameters_{window_length}sec_1iter.mat')
+    if os.path.exists(save_path):
+        os.remove(save_path)
+    scipy.io.savemat(save_path, fos_data, do_compression=True)
     avg_mse = np.mean(np.array(mse), axis = 0)
     mse_rows = []
     for iter_idx, mse in enumerate(avg_mse):
@@ -97,7 +100,7 @@ if __name__ == "__main__":
                 path = os.path.join(main_pathname, 'Data', patient, f'{patient}-{condition}-block-{seizure}.mat')
                 if os.path.exists(path):
                     all_jobs.append((seizure, patient, path, window_length, main_pathname, condition))
-    with Pool(processes=14) as pool:
+    with Pool(processes=12) as pool:
         results = pool.starmap(process_data, all_jobs)
 
     # for mse_rows in ictal_results + interictal_results:

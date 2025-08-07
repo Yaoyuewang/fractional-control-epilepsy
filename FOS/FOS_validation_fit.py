@@ -13,7 +13,7 @@ parameters = scipy.io.loadmat(os.path.join(main_pathname, 'data_v2', patient, f'
 raw_signal = scipy.io.loadmat(os.path.join(main_pathname, 'data', patient, f'{patient}-{phase}-block-{seizure}.mat'))
 alpha = parameters['alpha']
 A_matrix = parameters['A']
-
+xPred = parameters['xPred']
 print(alpha.shape)
 print(A_matrix.shape)
 
