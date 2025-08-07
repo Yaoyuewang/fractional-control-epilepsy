@@ -17,3 +17,4 @@ xPred = parameters['xPred']
 print(alpha.shape)
 print(A_matrix.shape)
 
+# need to locally center windowed raw data as well for r squared

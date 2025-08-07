@@ -5,7 +5,7 @@ import scipy.io
 import math 
 
 # patients = ['HUP64', 'HUP68','HUP70','HUP72','HUP78','HUP86','MAYO010','MAYO011','MAYO016','MAYO020']
-patients = ['HUP64', 'HUP68','HUP72','HUP78','HUP86','MAYO010','MAYO011','MAYO016','MAYO020']
+patients = ['MAYO010','MAYO011','MAYO016','MAYO020']
 # patients = ['HUP86']
 main_pathname = 'c:/Users/yaoyu/Documents/Epilepsy_research/'
 
@@ -97,7 +97,9 @@ for patient in patients:
                     col = (i - 1) // sampling_rate
                     eigs_before[:, col] = np.linalg.eigvals(A_no_ctrl)
                     eigs_after [:, col] = np.linalg.eigvals(A_current)
-            
+
             savepath = os.path.join(main_pathname, 'data_v2', patient, f"controlled_data_block_{seizure}.mat")
+            if os.path.exists(savepath):
+                os.remove(savepath)    
             scipy.io.savemat(savepath, {"evData": xPred, "Fs": sampling_rate, "eigs_before": eigs_before, "eigs_after": eigs_after})
 

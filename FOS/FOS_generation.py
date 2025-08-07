@@ -11,11 +11,9 @@ from tqdm import tqdm
 from functions import fracOrdUU, reconstruct_FOS
 from multiprocessing import Pool
 
-# patients = ['HUP64', 'HUP68','HUP70','HUP72','HUP78','HUP86','MAYO010','MAYO011','MAYO016','MAYO020']
-patients = ['MAYO010','MAYO011','MAYO016','MAYO020']
+patients = ['HUP64', 'HUP68','HUP70','HUP72','HUP78','HUP86','MAYO010','MAYO011','MAYO016','MAYO020']
 
 # patients = ['HUP70']
-num_seizures = 35 
 window_length = 3
 stride = 1 
 main_pathname = 'c:/Users/yaoyu/Documents/Epilepsy_research/'
@@ -29,6 +27,7 @@ def process_block(sampling_rate, evData, num_chns, window_length):
     num_windows = int((evData.shape[1]- window_samples) / stride_samples) + 1
 
     xPred = np.zeros((num_chns,evData.shape[1]))
+    counts = np.zeros(evData.shape[1])
     eigenvalues = np.zeros((num_chns, num_windows), dtype=np.complex128)
     eigenvectors = np.zeros((num_chns, num_chns, num_windows), dtype=np.complex128)
     alpha = np.zeros((num_chns, num_windows))
@@ -48,14 +47,15 @@ def process_block(sampling_rate, evData, num_chns, window_length):
         alpha[:, window] = fModel._order
         A[:, :, window] = np.squeeze(fModel._AMat[-1])
 
-        xPred[:, start_idx:start_idx + sampling_rate * window_length] = reconstruct_FOS(
-            alpha[:, window], A[:, :, window], X, num_chns, sampling_rate, window_length
-        )
-
+        xPred_window = reconstruct_FOS(alpha[:, window], A[:, :, window], X, num_chns, sampling_rate, window_length)
+        xPred[:, start_idx:start_idx + window_samples] += xPred_window
+        counts[:, start_idx:start_idx + window_samples] += 1
         v = np.where(fModel._order == 0, 1, gamma(1 - fModel._order) / gamma(-fModel._order))
         D = np.diag(v)
         A_0[:, :, window] = A[:, :, window] - D
         eigenvalues[:, window], eigenvectors[:, :, window] = np.linalg.eig(A_0[:, :, window])
+    counts[counts == 0] = 1
+    xPred /= counts[np.newaxis, :]
     return alpha, A, A_0, eigenvalues, eigenvectors, xPred, all_mse
 
 def process_data(seizure, patient, path, window_length, main_pathname, condition):
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     all_mse_rows = []
     all_jobs = []
     for patient in patients:
-        for seizure in range(9):
+        for seizure in range(1, 9):
             for condition in ["ictal", "interictal"]:
                 path = os.path.join(main_pathname, 'Data', patient, f'{patient}-{condition}-block-{seizure}.mat')
                 if os.path.exists(path):
