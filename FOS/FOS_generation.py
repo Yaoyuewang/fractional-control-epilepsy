@@ -38,8 +38,7 @@ def process_block(sampling_rate, evData, num_chns, window_length):
     # print(f"Running block in PID {os.getpid()}")
     for window, start_idx in enumerate(range(0, evData.shape[1] - window_samples + 1, stride_samples)):
         X = evData[:, start_idx:start_idx + window_samples]
-        X = X.T - np.mean(X, axis = 1)
-        X = X.T
+        X = X - np.mean(X, axis = 1, keepdims=True)
         fModel = fracOrdUU(verbose=-1)
         mseIter = fModel.fit(X)
         all_mse.append(mseIter)
