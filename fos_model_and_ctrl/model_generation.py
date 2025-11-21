@@ -4,8 +4,6 @@ import pandas as pd
 from scipy.special import gamma
 import scipy.io
 import os
-import math
-import mat73
 import csv
 from tqdm import tqdm 
 from functions import fracOrdUU, reconstruct_FOS
@@ -13,13 +11,11 @@ from multiprocessing import Pool
 
 patients = ['HUP64', 'HUP68','HUP70','HUP72','HUP78','HUP86','MAYO010','MAYO011','MAYO016','MAYO020']
 
-# patients = ['HUP70']
 window_length = 3
 stride = 1 
 main_pathname = 'c:/Users/yaoyu/Documents/Epilepsy_research/'
 
 # compute the FOS parameters for both ictal data and interictal snapshots for every patient and every ictal snapshot
-# you should only have to run this one time
 
 def process_block(sampling_rate, evData, num_chns, window_length):
     window_samples = window_length* sampling_rate
@@ -48,7 +44,7 @@ def process_block(sampling_rate, evData, num_chns, window_length):
 
         xPred_window = reconstruct_FOS(alpha[:, window], A[:, :, window], X, num_chns, sampling_rate, window_length)
         xPred[:, start_idx:start_idx + window_samples] += xPred_window
-        counts[:, start_idx:start_idx + window_samples] += 1
+        counts[start_idx:start_idx + window_samples] += 1
         v = np.where(fModel._order == 0, 1, gamma(1 - fModel._order) / gamma(-fModel._order))
         D = np.diag(v)
         A_0[:, :, window] = A[:, :, window] - D
@@ -78,7 +74,7 @@ def process_data(seizure, patient, path, window_length, main_pathname, condition
         "eigenvalues": eigenvalues, "eigenvectors": eigenvectors, 
         "xPred": xPred
     }
-    save_path = os.path.join(main_pathname, 'data_v2', patient, f'{condition}-block-{seizure}_parameters_{window_length}sec_1iter.mat')
+    save_path = os.path.join(main_pathname, 'data_v2', patient, f'{condition}_block_{seizure}_parameters_{window_length}sec_1iter.mat')
     if os.path.exists(save_path):
         os.remove(save_path)
     scipy.io.savemat(save_path, fos_data, do_compression=True)

@@ -4,8 +4,7 @@ import numpy as np
 import scipy.io
 import math 
 
-# patients = ['HUP64', 'HUP68','HUP70','HUP72','HUP78','HUP86','MAYO010','MAYO011','MAYO016','MAYO020']
-patients = ['HUP70']
+patients = ['HUP64', 'HUP68','HUP70','HUP72','HUP78','HUP86','MAYO010','MAYO011','MAYO016','MAYO020']
 main_pathname = 'c:/Users/yaoyu/Documents/Epilepsy_research/'
 
 window_length = 3
@@ -15,8 +14,7 @@ for patient in patients:
         filepath = os.path.join(main_pathname, 'data', patient, f"{patient}-ictal-block-{seizure}.mat")
         if os.path.exists(filepath):
             print(f"{patient}_{seizure}")
-            # results = os.path.join(main_pathname, 'Results', patient, f"ictal-block-{seizure}")
-            FOS_params = scipy.io.loadmat(os.path.join(main_pathname, 'data_v2', patient, f"ictal-block-{seizure}_parameters_3sec_1iter.mat"))
+            FOS_params = scipy.io.loadmat(os.path.join(main_pathname, 'data_v2', patient, f"ictal_block_{seizure}_parameters_3sec_1iter.mat"))
             raw_data = scipy.io.loadmat(filepath)
             sampling_rate = int(np.ceil(raw_data['Fs'][0][0]))
             A = FOS_params["A"]
@@ -51,7 +49,8 @@ for patient in patients:
             # Set up and solve the problem
             prob = cp.Problem(objective, constraints)
             prob.solve(solver=cp.MOSEK)  # Try a different solver if needed
-
+            if prob.status != cp.OPTIMAL:
+                print(f"WARNING: {patient} seizure {seizure} - Optimization status: {prob.status}")
             # Extract results
             opt_L = np.array(L.value)
             opt_P = np.array(P.value)
@@ -98,8 +97,8 @@ for patient in patients:
                     eigs_before[:, col] = np.linalg.eigvals(A_no_ctrl)
                     eigs_after [:, col] = np.linalg.eigvals(A_current)
 
-            savepath = os.path.join(main_pathname, 'data_v2', patient, f"controlled_data_block_{seizure}.mat")
-            if os.path.exists(savepath):
-                os.remove(savepath)    
-            scipy.io.savemat(savepath, {"evData": xPred, "Fs": sampling_rate, "eigs_before": eigs_before, "eigs_after": eigs_after})
+            save_path = os.path.join(main_pathname, 'data_v2', patient, f"controlled_data_block_{seizure}.mat")
+            if os.path.exists(save_path):
+                os.remove(save_path)    
+            scipy.io.savemat(save_path, {"evData": xPred, "Fs": sampling_rate, "eigs_before": eigs_before, "eigs_after": eigs_after, "L": opt_L, "P": opt_P})
 

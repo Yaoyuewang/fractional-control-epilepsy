@@ -94,7 +94,6 @@ class fracOrdUU(object):
         p = np.polyfit(scale[:numScales-1], log_wavelet_scales[:numScales-1], 1)
         return p[0]/2
 
-
     def _estimateOrder(self, X):
         self._order = np.empty((self._numCh,))
 
@@ -120,9 +119,9 @@ class fracOrdUU(object):
         else:
             colInd = colInd[0][:self._numInp]
             self._BMat = B[:,colInd]
+            print(self._BMat)
         if np.linalg.matrix_rank(B) < self._numInp:
             raise Exception('rank deficient B')
-
 
     def _performLeastSq(self, Y, X):
         # X and Y are shape of (K,numCh)
