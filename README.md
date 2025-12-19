@@ -5,8 +5,6 @@ This repository contains the code used in the paper:
 **Stabilizing Fractional Dynamical Networks Suppresses Epileptic Seizures**
 Yaoyue Wang, Arian Ashourvan, Guilherme Ramos, Paul Bogdan, Emily A. Pereira
 
----
-
 ## Overview
 
 This code implements a **fractional-order dynamical network modeling and control pipeline** for intracranial EEG (iEEG) data. The main components include:
@@ -19,8 +17,6 @@ This code implements a **fractional-order dynamical network modeling and control
 
 The pipeline is evaluated on real patient iEEG recordings across multiple seizures.
 
----
-
 ## Citation
 
 If you use this code, please cite:
@@ -31,14 +27,9 @@ Stabilizing Fractional Dynamical Networks Suppresses Epileptic Seizures.
 arXiv preprint, 2025.
 ```
 
----
-
 ## Data
 
 Intracranial EEG data are obtained from the International Epilepsy Electrophysiology Portal (IEEG Portal).
-Data access requires separate approval.
-
----
 
 ## Notes
 
