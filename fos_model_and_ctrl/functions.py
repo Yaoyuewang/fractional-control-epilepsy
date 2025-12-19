@@ -7,6 +7,9 @@ import scipy.sparse.linalg as sLA
 import math
 import time 
 
+# Code from Gaurav Gupta (https://github.com/gaurav71531/UUknowns/blob/master/fracModel.py)
+# Gupta, G. et al. Dealing with unknown unknowns: Identification and selection of minimal sensing for fractional dynamics with unknown inputs.
+# 
 class HaarWaveletTransform(object):
     def __init__(self, X):
         self._N = np.shape(X)
