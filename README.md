@@ -3,7 +3,7 @@
 This repository contains the code used in the paper:
 
 **Stabilizing Fractional Dynamical Networks Suppresses Epileptic Seizures**
-Yaoyue Wang, Arian Ashourvan, Guilherme Ramos, Paul Bogdan, Emily A. Pereira
+Yaoyue Wang, Arian Ashourvan, Guilherme Ramos, Paul Bogdan, Emily Pereira
 
 ## Overview
 
@@ -22,7 +22,7 @@ The pipeline is evaluated on real patient iEEG recordings across multiple seizur
 If you use this code, please cite:
 
 ```
-Wang, Y., Ashourvan, A., Ramos, G., Bogdan, P., & Pereira, E. A.
+Wang, Y., Ashourvan, A., Ramos, G., Bogdan, P., & Pereira, E.
 Stabilizing Fractional Dynamical Networks Suppresses Epileptic Seizures.
 arXiv preprint, 2025.
 ```
