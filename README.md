@@ -22,7 +22,7 @@ The pipeline is evaluated on real patient iEEG recordings across multiple seizur
 If you use this code, please cite:
 
 ```
-Wang, Y., Ashourvan, A., Ramos, G., Bogdan, P., & Pereira, E.
+Wang, Y., Ashourvan, A., Ramos, G., & Pereira, E.
 Stabilizing Fractional Dynamical Networks Suppresses Epileptic Seizures.
 arXiv preprint, 2025.
 ```
